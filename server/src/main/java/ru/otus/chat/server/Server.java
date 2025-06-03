@@ -1,6 +1,5 @@
 package ru.otus.chat.server;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
-    private int port;
+    private final int port;
     private List<ClientHandler> clients;
 
     public Server(int port) {
