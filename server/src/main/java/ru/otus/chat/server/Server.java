@@ -1,5 +1,7 @@
 package ru.otus.chat.server;
 
+import ru.otus.chat.server.exception.CommonServerException;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,7 +25,7 @@ public class Server {
                 subscribe(new ClientHandler(socket, this));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CommonServerException(e);
         }
     }
 

@@ -1,5 +1,7 @@
 package ru.otus.chat.server;
 
+import ru.otus.chat.server.exception.CommonServerException;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class ClientHandler {
         try {
             out.writeUTF(message);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CommonServerException(e);
         }
     }
 
