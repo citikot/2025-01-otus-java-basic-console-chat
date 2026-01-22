@@ -20,7 +20,10 @@ public class ClientHandler {
         this.server = server;
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
+        handleClient();
+    }
 
+    private void handleClient() {
         username = "user" + socket.getPort();
         sendMsg("Вы подключились под ником: " + username);
 
@@ -48,44 +51,44 @@ public class ClientHandler {
         }).start();
     }
 
-    public void sendMsg(String message) {
-        try {
-            out.writeUTF(message);
-        } catch (IOException e) {
-            throw new CommonServerException(e);
-        }
+public void sendMsg(String message) {
+    try {
+        out.writeUTF(message);
+    } catch (IOException e) {
+        throw new CommonServerException(e);
     }
+}
 
-    public String getUsername() {
-        return username;
-    }
+public String getUsername() {
+    return username;
+}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+public void setUsername(String username) {
+    this.username = username;
+}
 
-    public void disconnect() {
-        server.unsubscribe(this);
-        try {
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+public void disconnect() {
+    server.unsubscribe(this);
+    try {
+        if (in != null) {
+            in.close();
         }
-        try {
-            if (out != null) {
-                out.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+    try {
+        if (out != null) {
+            out.close();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    try {
+        if (socket != null) {
+            socket.close();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 }
