@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Server {
+public class Server implements OtusServer {
     private final int port;
     private List<ClientHandler> clients;
 
@@ -34,12 +34,12 @@ public class Server {
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
-        broadcastMessage("Клиент " + clientHandler.getUsername() + " вышел из чата");
+        broadcast("Клиент " + clientHandler.getUsername() + " вышел из чата");
         System.out.println("Клиент " + clientHandler.getUsername() + " вышел из чата");
         clients.remove(clientHandler);
     }
 
-    public void broadcastMessage(String message) {
+    public void broadcast(String message) {
         for (ClientHandler c : clients) {
             c.sendMsg(message);
         }

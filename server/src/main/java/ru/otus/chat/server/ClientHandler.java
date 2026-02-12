@@ -12,7 +12,6 @@ public class ClientHandler {
     private Server server;
     private DataInputStream in;
     private DataOutputStream out;
-
     private String username;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
@@ -23,13 +22,13 @@ public class ClientHandler {
         handleClient();
     }
 
-    private void handleClient() {
-        username = "user" + socket.getPort();
-        sendMsg("Вы подключились под ником: " + username);
+    private void handleClient() throws IOException {
+        sendMsg("Введите ваш никнейм: ");
+        String username = in.readUTF();
 
         new Thread(() -> {
             try {
-                System.out.println("Клиент подключился " + socket.getPort());
+                System.out.println("Клиент подключился на порту: " + socket.getPort());
 
                 while (true) {
                     String message = in.readUTF();
@@ -40,7 +39,7 @@ public class ClientHandler {
                         }
 
                     } else {
-                        server.broadcastMessage(username + ": " + message);
+                        server.broadcast(username + ": " + message);
                     }
                 }
             } catch (IOException e) {
