@@ -19,7 +19,7 @@ public class Client {
         in = new DataInputStream(socket.getInputStream());
 
         try {
-            new Thread(() -> {
+            new Thread(() -> { // чтение сообщений, которые присылает сервер, в отдельном потоке
                 try {
                     while (true) {
                         String message = in.readUTF();
@@ -37,7 +37,7 @@ public class Client {
                 }
             }).start();
 
-            while (true) {
+            while (true) { // чтение ввода клиента в чате
                 String message = scanner.nextLine();
                 out.writeUTF(message);
                 if (message.equals("/exit")) {

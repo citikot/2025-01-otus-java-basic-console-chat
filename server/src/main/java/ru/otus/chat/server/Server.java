@@ -1,6 +1,7 @@
 package ru.otus.chat.server;
 
-import java.io.DataInputStream;
+import ru.otus.chat.server.exception.CommonServerException;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
-    private int port;
+    private final int port;
     private List<ClientHandler> clients;
 
     public Server(int port) {
@@ -24,7 +25,7 @@ public class Server {
                 subscribe(new ClientHandler(socket, this));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CommonServerException(e);
         }
     }
 
@@ -33,14 +34,23 @@ public class Server {
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
-        broadcastMessage("Клиент " + clientHandler.getUsername() + " вышел из чата");
+        broadcast("Клиент " + clientHandler.getUsername() + " вышел из чата");
         System.out.println("Клиент " + clientHandler.getUsername() + " вышел из чата");
         clients.remove(clientHandler);
     }
 
-    public void broadcastMessage(String message) {
+    public void broadcast(String message) {
         for (ClientHandler c : clients) {
             c.sendMsg(message);
         }
+    }
+
+    public void sendMsgToClient(String username, String message) {
+        ClientHandler client = getClientByUsername(username);
+        client.sendMsg(message);
+    }
+
+    private ClientHandler getClientByUsername(String username) {
+        return clients.stream().filter(c -> c.getUsername().equals(username)).findFirst().orElse(null);
     }
 }

@@ -1,5 +1,7 @@
 package ru.otus.chat.server;
 
+import ru.otus.chat.server.exception.CommonServerException;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,7 +12,6 @@ public class ClientHandler {
     private Server server;
     private DataInputStream in;
     private DataOutputStream out;
-
     private String username;
 
     public ClientHandler(Socket socket, Server server) throws IOException {
@@ -18,24 +19,30 @@ public class ClientHandler {
         this.server = server;
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
+        handleClient();
+    }
 
-        username = "user" + socket.getPort();
-        sendMsg("Вы подключились под ником: " + username);
+    private void handleClient() throws IOException {
+        sendMsg("Введите ваш никнейм: ");
+        username = in.readUTF();
 
-        new Thread(() -> {
+        new Thread(() -> { // чтение сообщений, которые приходят от клиента
             try {
-                System.out.println("Клиент подключился " + socket.getPort());
+                System.out.println("Клиент " + username + " подключился на порту: " + socket.getPort());
 
                 while (true) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
-                            sendMsg("/exitok");
+                            sendMsg("/exitok"); // отправка клиенту подтверждения об успешном отключении, чтобы клиент у себя нормально закрылся
                             break;
                         }
-
+                        String[] args = message.split(" ", 3);
+                        if (args[0].equals("/w")) {
+                            server.sendMsgToClient(args[1], username + ": " + args[2]);
+                        }
                     } else {
-                        server.broadcastMessage(username + ": " + message);
+                        server.broadcast(username + ": " + message);
                     }
                 }
             } catch (IOException e) {
@@ -50,7 +57,7 @@ public class ClientHandler {
         try {
             out.writeUTF(message);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CommonServerException(e);
         }
     }
 
