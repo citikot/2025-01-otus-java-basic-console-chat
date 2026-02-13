@@ -24,20 +24,23 @@ public class ClientHandler {
 
     private void handleClient() throws IOException {
         sendMsg("Введите ваш никнейм: ");
-        String username = in.readUTF();
+        username = in.readUTF();
 
-        new Thread(() -> {
+        new Thread(() -> { // чтение сообщений, которые приходят от клиента
             try {
-                System.out.println("Клиент подключился на порту: " + socket.getPort());
+                System.out.println("Клиент " + username + " подключился на порту: " + socket.getPort());
 
                 while (true) {
                     String message = in.readUTF();
                     if (message.startsWith("/")) {
                         if (message.equals("/exit")) {
-                            sendMsg("/exitok");
+                            sendMsg("/exitok"); // отправка клиенту подтверждения об успешном отключении, чтобы клиент у себя нормально закрылся
                             break;
                         }
-
+                        String[] args = message.split(" ", 3);
+                        if (args[0].equals("/w")) {
+                            server.sendMsgToClient(args[1], username + ": " + args[2]);
+                        }
                     } else {
                         server.broadcast(username + ": " + message);
                     }
@@ -50,44 +53,44 @@ public class ClientHandler {
         }).start();
     }
 
-public void sendMsg(String message) {
-    try {
-        out.writeUTF(message);
-    } catch (IOException e) {
-        throw new CommonServerException(e);
-    }
-}
-
-public String getUsername() {
-    return username;
-}
-
-public void setUsername(String username) {
-    this.username = username;
-}
-
-public void disconnect() {
-    server.unsubscribe(this);
-    try {
-        if (in != null) {
-            in.close();
+    public void sendMsg(String message) {
+        try {
+            out.writeUTF(message);
+        } catch (IOException e) {
+            throw new CommonServerException(e);
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-    try {
-        if (out != null) {
-            out.close();
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void disconnect() {
+        server.unsubscribe(this);
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    try {
-        if (socket != null) {
-            socket.close();
+        try {
+            if (out != null) {
+                out.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 }
